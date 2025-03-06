@@ -1,3 +1,27 @@
+<?php
+include 'db_connect.php'; // Ensure you have a file to connect to the database
+
+// Fetch product count from the database
+$productCountQuery = "SELECT COUNT(*) as total FROM product";
+$productCountResult = $conn->query($productCountQuery);
+$productCount = 0;
+
+if ($productCountResult && $productCountResult->num_rows > 0) {
+    $row = $productCountResult->fetch_assoc();
+    $productCount = $row['total'];
+}
+
+// Fetch customer count from the database
+$customerCountQuery = "SELECT COUNT(*) as total FROM usertable";
+$customerCountResult = $conn->query($customerCountQuery);
+$customerCount = 0;
+
+if ($customerCountResult && $customerCountResult->num_rows > 0) {
+    $row = $customerCountResult->fetch_assoc();
+    $customerCount = $row['total'];
+}
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -152,7 +176,7 @@ th {
             <h2>The Coffee Hub</h2>
        
         <ul>
-            <li><a href="Dashboard"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+            <li><a href="Dashbord"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
             <li><a href="products.php" class="active"><i class="fas fa-coffee"></i> Products</a></li>
             <li><a href="orders.php"><i class="fas fa-receipt"></i> Orders</a></li>
             <li><a href="Customers.php"><i class="fas fa-users"></i> Customers</a></li>
@@ -186,7 +210,7 @@ th {
 
                 <div class="card-single">
                     <div>
-                        <h3>79</h3>
+                        <h3><?php echo $customerCount; ?></h3>
                         <span>Customers</span>
                     </div>
                     <div>
@@ -206,7 +230,7 @@ th {
 
                 <div class="card-single">
                     <div>
-                        <h3>20</h3>
+                        <h3><?php echo $productCount; ?></h3>
                         <span>Products</span>
                     </div>
                     <div>

@@ -121,7 +121,7 @@ $result = $conn->query($sql);
       text-align: center;
       background: #6F4E37;
       color: white;
-      padding: 2px;
+      padding: 0px;
       position: fixed;
       width: 100%;
       bottom: 0;
@@ -151,11 +151,10 @@ $result = $conn->query($sql);
 <section class="home" id="home">
   <div class="content">
     <img src="bg.jpg" alt="Background Image">
-    <h3>Fresh Coffee in the Morning</h3>
+    <h1>Fresh Coffee in the Morning</h1>
     <p>Experience the rich and bold flavors of our exquisite coffee blends, crafted to awaken your senses and start your day right. We roast the best organic coffee! Experience the highest quality 100% Arabica coffee beans from along the equatorial belt. We focus on roasting delicious certified organic coffee and Fair Trade Certified coffee. Indulge yourself and drink the best organic coffee!</p>
     <a href="contact.php" class="btn">Get it now</a> <br>
 
-    <a href="Product.php" class="btn">Product</a>
   </div>
 </section>
 

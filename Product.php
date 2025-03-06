@@ -275,15 +275,8 @@ $result = $conn->query($sql);
   <!-- Products Section -->
   <section class="products" id="products">
     <h1>Our Products</h1>
+
     
-    <?php if (isset($_SESSION['message'])): ?>
-        <div class="alert">
-            <?php 
-            echo $_SESSION['message']; 
-            unset($_SESSION['message']);
-            ?>
-        </div>
-    <?php endif; ?>
     
     <div class="box-container">
       <?php

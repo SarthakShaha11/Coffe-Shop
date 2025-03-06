@@ -2,6 +2,10 @@
 include 'db_connect.php'; 
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
+
+// Fetch products from the database
+$sql = "SELECT Product_id, name, price, image FROM product";
+$result = $conn->query($sql);
 ?>
 
 <!DOCTYPE html>
@@ -23,13 +27,13 @@ ini_set('display_errors', 1);
 
         .sidebar {
             background: #2c3e50;
-    color: rgb(16, 178, 219);
-    width: 250px;
-    height: 100vh;
-    position: fixed;
-    transition: all 0.3s;
-    left: 0;
-    top: 0;
+            color: rgb(16, 178, 219);
+            width: 250px;
+            height: 100vh;
+            position: fixed;
+            transition: all 0.3s;
+            left: 0;
+            top: 0;
         }
 
         .sidebar h2 {
@@ -206,9 +210,8 @@ ini_set('display_errors', 1);
                 <table>
                     <thead>
                         <tr>
-                            <th>ID</th>
+                            <th>Product ID</th>
                             <th>Name</th>
-                            <th>Category</th>
                             <th>Price</th>
                             <th>Image</th>
                             <th>Actions</th>
@@ -216,24 +219,21 @@ ini_set('display_errors', 1);
                     </thead>
                     <tbody>
                         <?php
-                        $result = $conn->query("SELECT * FROM products");
-
-                        if ($result && $result->num_rows > 0) {
+                        if ($result->num_rows > 0) {
                             while ($row = $result->fetch_assoc()) {
                                 echo "<tr>
-                                        <td>{$row['id']}</td>
+                                        <td>{$row['Product_id']}</td>
                                         <td>{$row['name']}</td>
-                                        <td>{$row['category']}</td>
-                                        <td>\${$row['price']}</td>
-                                        <td><img src='uploads/{$row['image']}' class='product-img'></td>
+                                        <td>₹" . number_format($row['price'], 2) . "</td>
+                                        <td><img src='uploads/{$row['image']}' alt='{$row['name']}' style='width: 50px; height: auto;'></td>
                                         <td>
-                                            <a href='edit_product.php?id={$row['id']}' class='btn edit-btn'>Edit</a>
-                                            <a href='delete_product.php?id={$row['id']}' class='btn delete-btn' onclick='return confirm(\"Are you sure?\")'>Delete</a>
+                                            <a href='edit_product.php?id={$row["Product_id"]}' class='btn edit-btn'>Edit</a>
+                                            <a href='delete_product.php?id={$row["Product_id"]}' class='btn delete-btn' onclick='return confirm(\"Are you sure you want to delete this product?\")'>Delete</a>
                                         </td>
                                       </tr>";
                             }
                         } else {
-                            echo "<tr><td colspan='6'>No products found.</td></tr>";
+                            echo "<tr><td colspan='5'>No products available.</td></tr>";
                         }
                         ?>
                     </tbody>

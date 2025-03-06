@@ -81,45 +81,97 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             margin: 0;
             padding: 20px;
         }
-        table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 15px;
-}
-
-th, td {
-    border: 1px solid #ddd;
-    padding: 10px;
-    text-align: center;
-}
-
-th {
-    background-color: #6F4E37;
-    color: white;
-}
-.btn-payment:hover {
-    background-color: #5a3c28;
-}
-
-.btn-cancel:hover {
-    background-color: #b52b38;
-}
-@media (max-width: 600px) {
-    .confirmation-container {
-        width: 90%;
-        padding: 20px;
-    }
-
-    .btn-container {
-        flex-direction: column;
-        gap: 10px;
-    }
-
-    .detail-row {
-        flex-direction: column;
-    }
-}
-
+        .header {
+            background: #6F4E37;
+            padding: 10px;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            left: 0;
+            z-index: 1000;
+        }
+        .confirmation-container {
+            max-width: 600px;
+            margin: 80px auto;
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        h1 {
+            color: #6F4E37;
+            margin-bottom: 30px;
+        }
+        .order-summary {
+            margin: 20px 0;
+            padding: 20px;
+            background: #f9f9f9;
+            border-radius: 4px;
+            text-align: left;
+        }
+        .order-summary h2 {
+            color: #6F4E37;
+            margin-bottom: 20px;
+        }
+        .order-summary p {
+            margin: 10px 0;
+            line-height: 1.6;
+        }
+        .btn-container {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            margin-top: 30px;
+        }
+        .btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: opacity 0.3s;
+        }
+        .btn-payment {
+            background: #6F4E37;
+            color: white;
+        }
+        .btn-cancel {
+            background: #dc3545;
+            color: white;
+        }
+        .btn:hover {
+            opacity: 0.9;
+        }
+        .confirmation-message {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 4px;
+            margin: 20px 0;
+        }
+        .customer-details {
+            background: #f9f9f9;
+            padding: 20px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+        }
+        .customer-details h2 {
+            color: #6F4E37;
+            margin-bottom: 15px;
+        }
+        .detail-row {
+            display: flex;
+            margin-bottom: 10px;
+        }
+        .detail-label {
+            width: 150px;
+            font-weight: bold;
+            color: #6F4E37;
+        }
+        .detail-value {
+            flex: 1;
+        }
     </style>
 </head>
 <body>

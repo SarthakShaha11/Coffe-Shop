@@ -26,13 +26,13 @@ if ($conn->connect_error) {
 
         .sidebar {
             background: #2c3e50;
-    color: rgb(16, 178, 219);
-    width: 250px;
-    height: 100vh;
-    position: fixed;
-    transition: all 0.3s;
-      left: 0;
-    top: 0;
+            color: rgb(16, 178, 219);
+            width: 250px;
+            height: 100vh;
+            position: fixed;
+            transition: all 0.3s;
+            left: 0;
+            top: 0;
         }
 
         .sidebar h2 {
@@ -111,20 +111,6 @@ if ($conn->connect_error) {
             font-size: 24px;
         }
 
-        .customers-header button {
-            background: #27ae60;
-            color: white;
-            padding: 10px 15px;
-            border: none;
-            cursor: pointer;
-            border-radius: 5px;
-            transition: 0.3s;
-        }
-
-        .customers-header button:hover {
-            background: #2ecc71;
-        }
-
         table {
             width: 100%;
             border-collapse: collapse;
@@ -166,33 +152,6 @@ if ($conn->connect_error) {
         .btn:hover {
             opacity: 0.8;
         }
-
-        .modal {
-            display: none;
-            position: fixed;
-            z-index: 1;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.4);
-        }
-
-        .modal-content {
-            background-color: white;
-            margin: 10% auto;
-            padding: 20px;
-            border: 1px solid #888;
-            width: 40%;
-            border-radius: 5px;
-        }
-
-        .close-btn {
-            float: right;
-            font-size: 20px;
-            cursor: pointer;
-        }
-
     </style>
 </head>
 <body>
@@ -223,7 +182,6 @@ if ($conn->connect_error) {
         <main>
             <div class="customers-header">
                 <h3>All Customers</h3>
-                <button id="addCustomerBtn">Add Customer</button>
             </div>
 
             <div class="customers-table">
@@ -238,16 +196,16 @@ if ($conn->connect_error) {
                     </thead>
                     <tbody>
                         <?php
-                        $result = $conn->query("SELECT * FROM customers");
+                        $result = $conn->query("SELECT * FROM usertable"); // Fetching from usertable
                         if ($result->num_rows > 0) {
                             while ($row = $result->fetch_assoc()) {
                                 echo "<tr>
-                                    <td>{$row['id']}</td>
-                                    <td>{$row['name']}</td>
+                                    <td>{$row['User_id']}</td>
+                                    <td>{$row['user_name']}</td>
                                     <td>{$row['email']}</td>
                                     <td>
-                                        <button onclick='editCustomer({$row["id"]}, \"{$row["name"]}\", \"{$row["email"]}\")' class='btn edit-btn'>Edit</button>
-                                        <a href='delete_customer.php?id={$row["id"]}' onclick='return confirm(\"Are you sure?\")' class='btn delete-btn'>Delete</a>
+                                        <button onclick='editCustomer({$row["User_id"]}, \"{$row["user_name"]}\", \"{$row["email"]}\")' class='btn edit-btn'>Edit</button>
+                                        <a href='delete_customer.php?id={$row["User_id"]}' onclick='return confirm(\"Are you sure you want to delete this user?\")' class='btn delete-btn'>Delete</a>
                                     </td>
                                 </tr>";
                             }
@@ -260,28 +218,6 @@ if ($conn->connect_error) {
             </div>
         </main>
     </div>
-
-    <script>
-        document.getElementById('addCustomerBtn').addEventListener('click', function() {
-            document.getElementById('modalTitle').textContent = "Add Customer";
-            document.getElementById('customerId').value = "";
-            document.getElementById('customerName').value = "";
-            document.getElementById('customerEmail').value = "";
-            document.getElementById('customerModal').style.display = 'block';
-        });
-
-        function editCustomer(id, name, email) {
-            document.getElementById('modalTitle').textContent = "Edit Customer";
-            document.getElementById('customerId').value = id;
-            document.getElementById('customerName').value = name;
-            document.getElementById('customerEmail').value = email;
-            document.getElementById('customerModal').style.display = 'block';
-        }
-
-        function closeModal() {
-            document.getElementById('customerModal').style.display = 'none';
-        }
-    </script>
 
 </body>
 </html>
