@@ -23,10 +23,11 @@ $delivery_details = isset($_SESSION['delivery_details']) ? $_SESSION['delivery_d
 
 // Fetch order items from the session or database
 if (empty($_SESSION['order_items'])) {
+    // Fetch order items from the database
     $stmt = $conn->prepare("SELECT o.*, p.name as product_name, p.price 
-                           FROM orders o 
-                           JOIN product p ON o.product_id = p.product_id 
-                           WHERE o.order_id = ?");
+                             FROM orders o 
+                             JOIN product p ON o.product_id = p.product_id 
+                             WHERE o.order_id = ?");
     $stmt->bind_param("s", $order_id);
     $stmt->execute();
     $result = $stmt->get_result();
@@ -45,14 +46,9 @@ if (empty($_SESSION['order_items'])) {
     }
 
     $stmt->close();
-    $_SESSION['order_items'] = $order_items;
+    $_SESSION['order_items'] = $order_items; // Store in session
 } else {
-    $order_items = $_SESSION['order_items'];
-    // Recalculate subtotals for session items
-    foreach ($order_items as &$item) {
-        $item['subtotal'] = floatval($item['price']) * floatval($item['quantity']);
-    }
-    unset($item); // Break the reference
+    $order_items = $_SESSION['order_items']; // Retrieve from session
 }
 
 // Insert payment details
@@ -80,6 +76,8 @@ $conn->close();
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Bill - The Coffee Hub</title>
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap');
+
         body {
             font-family: 'Poppins', sans-serif;
             background: linear-gradient(135deg, #c2b280 0%, #6F4E37 100%);
@@ -238,6 +236,43 @@ $conn->close();
             border-left: 3px solid #c2b280;
         }
 
+        .divider {
+            height: 2px;
+            background: linear-gradient(90deg, #6F4E37, #c2b280);
+            margin: 20px 0;
+            border-radius: 1px;
+        }
+
+        h2 {
+            color: #6F4E37;
+            font-size: 20px;
+            margin: 20px 0;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #c2b280;
+        }
+
+        .print-section {
+            text-align: center;
+            margin-top: 30px;
+        }
+
+        .print-button {
+            background: linear-gradient(135deg, #6F4E37, #8B4513);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 500;
+            transition: transform 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .print-button:hover {
+            transform: translateY(-2px);
+        }
+
         @media print {
             body {
                 background: white;
@@ -250,6 +285,9 @@ $conn->close();
             .order-id {
                 background: #6F4E37 !important;
                 -webkit-print-color-adjust: exact;
+            }
+            .print-section {
+                display: none;
             }
         }
 
@@ -333,27 +371,37 @@ $conn->close();
         <table border="1">
             <thead>
                 <tr>
-                    <th>Product</th>
-                    <th>Name</th>
+                    <th>Product Name</th>
                     <th>Price</th>
                     <th>Quantity</th>
                     <th>Subtotal</th>
                 </tr>
             </thead>
             <tbody>
-                <?php foreach($order_items as $item): ?>
-                <tr>
-                    <td><?php echo htmlspecialchars($item['product_name'] ?? ''); ?></td>
-                    <td>₹<?php echo number_format(floatval($item['price'] ?? 0), 2); ?></td>
-                    <td><?php echo htmlspecialchars($item['quantity'] ?? 0); ?></td>
-                    <td>₹<?php echo number_format(floatval($item['subtotal'] ?? 0), 2); ?></t
-                </tr>
-                <?php endforeach; ?>
+                <?php if (!empty($order_items)): ?>
+                    <?php foreach($order_items as $item): ?>
+                        <tr>
+                            <td><?php echo htmlspecialchars($item['product_name'] ?? 'Unknown Product'); ?></td>
+                            <td>₹<?php echo number_format(floatval($item['price'] ?? 0), 2); ?></td>
+                            <td><?php echo htmlspecialchars($item['quantity'] ?? 0); ?></td>
+                            <td>₹<?php echo number_format(floatval($item['subtotal'] ?? 0), 2); ?></td>
+                        </tr>
+                    <?php endforeach; ?>
+                <?php else: ?>
+                    <tr>
+                        <td colspan="4">No items in this order.</td>
+                    </tr>
+                <?php endif; ?>
             </tbody>
         </table>
 
         <div class="total-amount">
             <h3>Total Amount: ₹<?php echo number_format(floatval($total_amount), 2); ?></h3>
+        </div>
+
+        <div class="print-section">
+            <button onclick="window.print()" class="print-button">Print Receipt</button>
+            <a href="index.php" class="home-link">GO to Home</a>
         </div>
     </div>
 </body>

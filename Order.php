@@ -39,11 +39,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         'address' => $address
     ];
 
-    // Insert order details into orders table
+    // Insert order details into order_items table
     foreach ($cart_items as $item) {
-        $stmt = $conn->prepare("INSERT INTO orders (Order_id, product_id, price, quantity) VALUES (?, ?, ?, ?)");
-        $stmt->bind_param("sidd", $order_id, $item['product_id'], $item['price'], $item['quantity']);
-        $stmt->execute();
+        $stmt = $conn->prepare("INSERT INTO order_items (order_id, product_id, quantity, price) VALUES (?, ?, ?, ?)");
+        $stmt->bind_param("iiid", $order_id, $item['product_id'], $item['quantity'], $item['price']);
+        
+        // Execute the statement
+        if (!$stmt->execute()) {
+            die("Error executing statement: " . $stmt->error);
+        }
         $stmt->close();
     }
 
@@ -175,7 +179,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                             <td><?php echo htmlspecialchars($item['product_name']); ?></td>
                             <td><?php echo htmlspecialchars($item['quantity']); ?></td>
                             <td>₹<?php echo number_format($item['price'], 2); ?></td>
-                            <td>₹<?php echo number_format($item['subtotal'], 2); ?></td>
+                            <td>₹<?php echo number_format($item['price'] * $item['quantity'], 2); ?></td>
                         </tr>
                         <?php endforeach; ?>
                     </tbody>

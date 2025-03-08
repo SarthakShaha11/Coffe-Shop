@@ -128,8 +128,8 @@ $result = $conn->query($sql);
         table {
             width: 100%;
             border-collapse: collapse;
-            background: white;
-            color: black;
+            background: rgba(255, 255, 255, 0.1); /* Light transparent background */
+            color: white; /* Text color */
             border-radius: 10px;
             overflow: hidden;
         }
@@ -137,12 +137,12 @@ $result = $conn->query($sql);
         th, td {
             padding: 12px;
             text-align: left;
-            border-bottom: 1px solid #ddd;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2); /* Light border */
         }
 
         th {
-            background: #2980b9;
-            color: white;
+            background: rgba(41, 128, 185, 0.8); /* Semi-transparent blue background */
+            color: white; /* Header text color */
         }
 
         .btn {
@@ -205,6 +205,7 @@ $result = $conn->query($sql);
                 <h3>All Products</h3>
                 <button id="addProductBtn">Add Product</button>
             </div>
+
 
             <div class="products-table">
                 <table>

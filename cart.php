@@ -32,34 +32,33 @@ $order_id = 'ORD_' . time() . '_' . rand(1000, 9999);
 // Store in session
 $_SESSION['order_id'] = $order_id;
 $_SESSION['total_amount'] = $total_amount;
-$_SESSION['cart_items'] = []; // Initialize cart items array
+$_SESSION['cart_items'] = [];
 
 // Store cart items in session
 if ($result->num_rows > 0) {
-    $result->data_seek(0); // Reset result pointer
+    $result->data_seek(0);
     while ($row = $result->fetch_assoc()) {
         $_SESSION['cart_items'][] = $row;
     }
 }
 
-// Only redirect if "Place Order" is clicked
+// Redirect if "Place Order" button is clicked
 if (isset($_POST['proceed_to_order'])) {
-    // Store cart data in session before redirecting
     $_SESSION['order_id'] = $order_id;
     $_SESSION['total_amount'] = $total_amount;
     
     // Store cart items with product details
-    $cart_items = array();
+    $cart_items = [];
     if ($result->num_rows > 0) {
-        $result->data_seek(0); // Reset result pointer
+        $result->data_seek(0);
         while ($row = $result->fetch_assoc()) {
-            $cart_items[] = array(
-                'product_id' => $row['product_id'],
+            $cart_items[] = [
+                'product_id'   => $row['product_id'],
                 'product_name' => $row['product_name'],
-                'price' => $row['product_price'],
-                'quantity' => $row['quantity'],
-                'subtotal' => $row['product_price'] * $row['quantity']
-            );
+                'price'        => $row['product_price'],
+                'quantity'     => $row['quantity'],
+                'subtotal'     => $row['product_price'] * $row['quantity']
+            ];
         }
     }
     $_SESSION['cart_items'] = $cart_items;
@@ -222,7 +221,7 @@ if (isset($_POST['proceed_to_order'])) {
   <a href="index.php" class="logo">
     <img src="logo.jpg" alt="The Coffee Hub Logo" />
   </a>
-  <nav class="navbar" aria-label="Main Navigation">
+  <nav class="navbar">
     <a href="index.php">Home</a>
     <a href="product.php">Products</a>
     <a href="contact.php">Contact</a>
@@ -249,22 +248,18 @@ if (isset($_POST['proceed_to_order'])) {
     <tbody>
         <?php
         if ($result->num_rows > 0) {
-            $result->data_seek(0); // Reset result pointer
+            $result->data_seek(0);
             while ($row = $result->fetch_assoc()) {
                 $subtotal = $row["product_price"] * $row["quantity"];
-                echo '<tr>';
-                echo '<td>' . htmlspecialchars($row["product_id"]) . '</td>';
-                echo '<td>' . htmlspecialchars($row["product_name"]) . '</td>';
-                echo '<td>' . number_format($row["product_price"], 2) . '</td>';
-                echo '<td>' . htmlspecialchars($row["quantity"]) . '</td>';
-                echo '<td>' . number_format($subtotal, 2) . '</td>';
-                echo '<td><a href="remove_from_cart.php?id=' . urlencode($row["product_id"]) . '" class="btn" onclick="return confirmDelete()">Remove</a></td>';
-                echo '</tr>';
+                echo "<tr>
+                        <td>{$row['product_id']}</td>
+                        <td>{$row['product_name']}</td>
+                        <td>₹" . number_format($row['product_price'], 2) . "</td>
+                        <td>{$row['quantity']}</td>
+                        <td>₹" . number_format($subtotal, 2) . "</td>
+                        <td><a href='remove_from_cart.php?id={$row['product_id']}' class='btn' onclick='return confirmDelete()'>Remove</a></td>
+                      </tr>";
             }
-            echo '<tr class="total-row">';
-            echo '<td colspan="4" style="text-align: right;"><strong>Total:</strong></td>';
-            echo '<td colspan="2"><strong>₹' . number_format($total_amount, 2) . '</strong></td>';
-            echo '</tr>';
         } else {
             echo '<tr><td colspan="6">Your cart is empty.</td></tr>';
         }
@@ -274,18 +269,12 @@ if (isset($_POST['proceed_to_order'])) {
 
 <div class="action-btns">
     <a href="product.php" class="btn">Continue Shopping</a>
-    <?php if ($result->num_rows > 0): ?>
     <form method="POST">
         <button type="submit" name="proceed_to_order" class="btn">Place Order</button>
     </form>
-    <?php endif; ?>
 </div>
 
-<?php $conn->close(); ?>
-
-<footer class="footer">
-  <p>&copy; 2024 The Coffee Hub. All rights reserved.</p>
-</footer>
+<footer class="footer">&copy; 2024 The Coffee Hub. All rights reserved.</footer>
 
 </body>
 </html>

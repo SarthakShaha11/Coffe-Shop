@@ -24,9 +24,9 @@ $order_id = $_SESSION['order_id'];
 $delivery_details = $_SESSION['delivery_details'];
 
 // Fetch order details including products
-$sql = "SELECT o.*, p.name as product_name, p.image 
+$sql = "SELECT o.*, p.name as product_name, p.image, o.product_id 
         FROM orders o 
-        JOIN product p ON o.product_id = p.id 
+        JOIN product p ON o.product_id = p.product_id 
         WHERE o.order_id = ?";
 $stmt = $conn->prepare($sql);
 $stmt->bind_param("s", $order_id);
@@ -62,7 +62,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         unset($_SESSION['cart_items']);
         unset($_SESSION['delivery_details']);
 
-        header("Location: index.php");
+        header("Location: cart.php"); // Redirect to cart page
         exit();
     }
 }
