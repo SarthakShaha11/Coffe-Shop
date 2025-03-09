@@ -2,42 +2,23 @@
 session_start();
 
 // Check if order details exist
-if (!isset($_SESSION['order_id']) || !isset($_SESSION['delivery_details'])) {
+if (!isset($_SESSION['order_id']) || !isset($_SESSION['delivery_details']) || !isset($_SESSION['cart_items'])) {
     header("Location: cart.php");
     exit();
 }
 
-// Database connection
-$servername = "localhost";
-$username = "root";
-$password = "";
-$dbname = "ch";
-
-$conn = new mysqli($servername, $username, $password, $dbname);
-
-// Check connection
-if ($conn->connect_error) {
-    die("Connection failed: " . $conn->connect_error);
-}
-
+// Get session data
 $order_id = $_SESSION['order_id'];
 $delivery_details = $_SESSION['delivery_details'];
-
-// Fetch order details including products
-$sql = "SELECT o.*, p.name as product_name, p.image, o.product_id 
-        FROM orders o 
-        JOIN product p ON o.product_id = p.product_id 
-        WHERE o.order_id = ?";
-$stmt = $conn->prepare($sql);
-$stmt->bind_param("s", $order_id);
-$stmt->execute();
-$result = $stmt->get_result();
-$order_items = $result->fetch_all(MYSQLI_ASSOC);
+$cart_items = $_SESSION['cart_items'];
 
 // Calculate total amount
 $total_amount = 0;
-foreach ($order_items as $item) {
-    $total_amount += $item['price'] * $item['quantity'];
+foreach ($cart_items as $item) {
+    // Ensure price and quantity are set
+    $price = $item['price'] ?? 0; // Default to 0 if not set
+    $quantity = $item['quantity'] ?? 0; // Default to 0 if not set
+    $total_amount += $price * $quantity;
 }
 
 // Handle form submission
@@ -46,6 +27,19 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         header("Location: payment.php");
         exit();
     } elseif (isset($_POST['cancel_order'])) {
+        // Database connection
+        $servername = "localhost";
+        $username = "root";
+        $password = "";
+        $dbname = "ch";
+
+        $conn = new mysqli($servername, $username, $password, $dbname);
+
+        // Check connection
+        if ($conn->connect_error) {
+            die("Connection failed: " . $conn->connect_error);
+        }
+
         // Insert into cancellation table
         $stmt = $conn->prepare("INSERT INTO cancelation (order_id, price) VALUES (?, ?)");
         $stmt->bind_param("id", $order_id, $total_amount);
@@ -81,15 +75,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             margin: 0;
             padding: 20px;
         }
-        .header {
-            background: #6F4E37;
-            padding: 10px;
-            position: fixed;
-            width: 100%;
-            top: 0;
-            left: 0;
-            z-index: 1000;
-        }
         .confirmation-container {
             max-width: 600px;
             margin: 80px auto;
@@ -114,63 +99,57 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             color: #6F4E37;
             margin-bottom: 20px;
         }
-        .order-summary p {
-            margin: 10px 0;
-            line-height: 1.6;
-        }
-        .btn-container {
-            display: flex;
-            gap: 20px;
-            justify-content: center;
-            margin-top: 30px;
-        }
-        .btn {
-            padding: 12px 25px;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 16px;
-            font-weight: bold;
-            transition: opacity 0.3s;
-        }
-        .btn-payment {
-            background: #6F4E37;
-            color: white;
-        }
-        .btn-cancel {
-            background: #dc3545;
-            color: white;
-        }
-        .btn:hover {
-            opacity: 0.9;
-        }
-        .confirmation-message {
-            background: #f8f9fa;
-            padding: 15px;
-            border-radius: 4px;
+        table {
+            width: 100%;
+            border-collapse: collapse;
             margin: 20px 0;
         }
-        .customer-details {
-            background: #f9f9f9;
-            padding: 20px;
-            border-radius: 6px;
-            margin-bottom: 20px;
+        th, td {
+            padding: 12px;
+            border-bottom: 1px solid #ddd;
+            text-align: left;
         }
-        .customer-details h2 {
-            color: #6F4E37;
-            margin-bottom: 15px;
+        th {
+            background-color: #6F4E37;
+            color: white;
         }
-        .detail-row {
-            display: flex;
-            margin-bottom: 10px;
-        }
-        .detail-label {
-            width: 150px;
-            font-weight: bold;
+        .total {
+            text-align: right;
+            font-size: 1.2em;
+            margin-top: 20px;
             color: #6F4E37;
         }
-        .detail-value {
-            flex: 1;
+        .btn {
+            padding: 12px 25px; /* Padding for the button */
+            border: none; /* Remove default border */
+            border-radius: 4px; /* Rounded corners */
+            cursor: pointer; /* Change cursor to pointer on hover */
+            font-size: 16px; /* Font size */
+            font-weight: bold; /* Bold text */
+            transition: background 0.3s, transform 0.3s; /* Smooth transition for background and transform */
+        }
+
+        /* Primary button style */
+        .btn-payment {
+            background: #6F4E37; /* Dark green background */
+            color: white; /* White text */
+        }
+
+        /* Cancel button style */
+        .btn-cancel {
+            background: #dc3545; /* Red background */
+            color: white; /* White text */
+        }
+
+        /* Hover effect for buttons */
+        .btn:hover {
+            opacity: 0.9; /* Slightly transparent on hover */
+            transform: scale(1.05); /* Slightly enlarge on hover */
+        }
+
+        /* Additional styles for button states */
+        .btn:active {
+            transform: scale(0.95); /* Slightly shrink on click */
         }
     </style>
 </head>
@@ -201,27 +180,25 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 <thead>
                     <tr>
                         <th>Product</th>
-                        <th>Name</th>
-                        <th>Price</th>
                         <th>Quantity</th>
+                        <th>Price</th>
                         <th>Subtotal</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <?php foreach ($order_items as $item): ?>
+                    <?php foreach ($cart_items as $item): ?>
                     <tr>
-                        <td><img src="images/<?php echo htmlspecialchars($item['image']); ?>" width="50" alt="Product"></td>
                         <td><?php echo htmlspecialchars($item['product_name']); ?></td>
-                        <td>₹<?php echo number_format($item['price'], 2); ?></td>
                         <td><?php echo htmlspecialchars($item['quantity']); ?></td>
-                        <td>₹<?php echo number_format($item['price'] * $item['quantity'], 2); ?></td>
+                        <td>₹<?php echo number_format($item['price'] ?? 0, 2); ?></td>
+                        <td>₹<?php echo number_format(($item['price'] ?? 0) * ($item['quantity'] ?? 0), 2); ?></td>
                     </tr>
                     <?php endforeach; ?>
                 </tbody>
             </table>
             
-            <div class="total-amount">
-                <h3>Total Amount: ₹<?php echo number_format($total_amount, 2); ?></h3>
+            <div class="total">
+                <strong>Total Amount: ₹<?php echo number_format($total_amount, 2); ?></strong>
             </div>
         </div>
 
@@ -234,4 +211,4 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         </form>
     </div>
 </body>
-</html> 
+</html>

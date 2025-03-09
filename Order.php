@@ -178,8 +178,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                         <tr>
                             <td><?php echo htmlspecialchars($item['product_name']); ?></td>
                             <td><?php echo htmlspecialchars($item['quantity']); ?></td>
-                            <td>₹<?php echo number_format($item['price'], 2); ?></td>
-                            <td>₹<?php echo number_format($item['price'] * $item['quantity'], 2); ?></td>
+                            <td>₹<?php echo number_format($item['price'] ?? 0, 2); ?></td>
+                            <td>₹<?php echo number_format(($item['price'] ?? 0) * ($item['quantity'] ?? 0), 2); ?></td>
                         </tr>
                         <?php endforeach; ?>
                     </tbody>

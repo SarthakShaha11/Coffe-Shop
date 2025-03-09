@@ -336,7 +336,7 @@ $conn->close();
                 <input type="hidden" name="total_amount" value="<?php echo number_format(floatval($total_amount), 2, '.', ''); ?>">
                 <input type="hidden" name="payment_method" value="Cash on Delivery">
                 
-                <input type="submit" value="Place Order">
+                <input type="submit" value="Submit">
             </form>
         </div>
     </div>

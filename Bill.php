@@ -13,8 +13,14 @@ if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
-$order_id = isset($_POST['order_id']) ? $_POST['order_id'] : $_SESSION['order_id'];
-$total_amount = isset($_POST['total_amount']) ? floatval($_POST['total_amount']) : floatval($_SESSION['total_amount']);
+// Check if session variables are set
+if (!isset($_SESSION['order_id']) || !isset($_SESSION['total_amount'])) {
+    die("Order ID or total amount not set in session.");
+}
+
+// Retrieve session variables
+$order_id = $_SESSION['order_id'];
+$total_amount = $_SESSION['total_amount'];
 $payment_method = isset($_POST['payment_method']) ? $_POST['payment_method'] : 'COD';
 $transaction_id = isset($_POST['transaction_id']) ? $_POST['transaction_id'] : null;
 
@@ -250,7 +256,25 @@ $conn->close();
             padding-bottom: 10px;
             border-bottom: 2px solid #c2b280;
         }
+        .home-link {
+                    display: inline-block;
+                    padding: 10px 20px;
+                    background-color: #6F4E37; /* Dark green background */
+                    color: white; /* White text */
+                    text-decoration: none; /* Remove underline */
+                    border-radius: 4px; /* Rounded corners */
+                    font-weight: bold; /* Bold text */
+                    transition: background 0.3s, transform 0.3s; /* Smooth transition */
+                }
 
+                .home-link:hover {
+                    background-color: #5a3f2d; /* Darker green on hover */
+                    transform: scale(1.05); /* Slightly enlarge on hover */
+                }
+
+                .home-link:active {
+                    transform: scale(0.95); /* Slightly shrink on click */
+                }
         .print-section {
             text-align: center;
             margin-top: 30px;
@@ -342,19 +366,7 @@ $conn->close();
         <div class="order-details">
             <p>
                 <strong>Order ID:</strong> 
-                <span class="order-id">
-                    <?php 
-                    // Format order ID
-                    $formatted_order_id = $order_id;
-                    if (strpos($order_id, 'ORD_') === false) {
-                        $formatted_order_id = sprintf("ORD_%s_%05d", 
-                            date('Ymd'),
-                            substr(str_shuffle("0123456789"), 0, 5)
-                        );
-                    }
-                    echo htmlspecialchars($formatted_order_id); 
-                    ?>
-                </span>
+                <span class="order-id"><?php echo htmlspecialchars($order_id); ?></span>
             </p>
             <div class="transaction-info">
                 <p><strong>Payment Method:</strong> <?php echo htmlspecialchars($payment_method); ?></p>
@@ -381,10 +393,10 @@ $conn->close();
                 <?php if (!empty($order_items)): ?>
                     <?php foreach($order_items as $item): ?>
                         <tr>
-                            <td><?php echo htmlspecialchars($item['product_name'] ?? 'Unknown Product'); ?></td>
-                            <td>₹<?php echo number_format(floatval($item['price'] ?? 0), 2); ?></td>
-                            <td><?php echo htmlspecialchars($item['quantity'] ?? 0); ?></td>
-                            <td>₹<?php echo number_format(floatval($item['subtotal'] ?? 0), 2); ?></td>
+                            <td><?php echo htmlspecialchars($item['product_name']); ?></td>
+                            <td>₹<?php echo number_format(floatval($item['price']), 2); ?></td>
+                            <td><?php echo htmlspecialchars($item['quantity']); ?></td>
+                            <td>₹<?php echo number_format(floatval($item['subtotal']), 2); ?></td>
                         </tr>
                     <?php endforeach; ?>
                 <?php else: ?>
